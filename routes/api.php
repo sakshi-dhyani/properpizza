@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\AdminController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,6 +37,30 @@ Route::group(['prefix' => '/user/'], function () {
         Route::post('order',[UserController::class,'order']);
         Route::get('past-order',[UserController::class,'pastOrder']);
         Route::get('ongoing-order',[UserController::class,'ongoingOrder']);
+        Route::post('order-detail',[UserController::class,'orderDetail']);
+        Route::post('contact-us',[UserController::class,'contactUs']);
+        Route::post('logout',[UserController::class,'logOut']);
+
+        // Route::post('')
+    });
+
+});
+Route::group(['prefix' => '/admin/'], function () {
+    //User Route
+        Route::post('send-otp',[AdminController::class,'sendOtp']);
+        Route::post('login',[AdminController::class,'Login']);
+    Route::group(['middleware'     => ['admin']], function () {
+        Route::post('Active-inactive',[AdminController::class,'loginStatus']);
+        Route::get('previous-order',[AdminController::class,'previousOrder']);
+        Route::get('cancelled-order',[AdminController::class,'cancelledOrder']);    
+        Route::get('ongoing-order',[AdminController::class,'ongoingOrder']);
+        Route::get('upcoming-order',[AdminController::class,'upcomingOrder']);
+        Route::get('cancelation-reasons',[AdminController::class,'cancelationReason']);
+        Route::post('cancel-order',[AdminController::class,'cancelOrder']);
+        Route::post('accept-order',[AdminController::class,'acceptOrder']);
+        Route::post('out-for-delivery',[AdminController::class,'outDelivery']);
+        Route::get('contact-us',[AdminController::class,'contactUs']);
+
 
         // Route::post('')
     });

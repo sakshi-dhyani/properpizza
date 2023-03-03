@@ -18,6 +18,7 @@ class CreateOrderDetailsTable extends Migration
             $table->string('order_id')->comment('order id from order_management');
             $table->integer('user_id');
             $table->string('product_id');
+            $table->string('product_name');
             $table->string('small')->default(0);
             $table->string('medium')->default(0);
             $table->string('large')->default(0);

@@ -11,6 +11,7 @@ use App\Models\Menu;
 use Validator;
 use Response;
 use DB;
+use App\Models\ContactUs;
 use App\Models\OrderManagement;
 use App\Models\OrderDetails;
 class UserController extends Controller
@@ -267,6 +268,8 @@ class UserController extends Controller
         $validations = array(
             'shippping_address'  => 'required',
             'payment_method'  => 'required',
+            'transaction_id'  => 'required_if:payment_method,1',
+
         );
         $validator         = Validator::make($request->all(),$validations);
         if($validator->fails()){
@@ -282,10 +285,12 @@ class UserController extends Controller
         $userCartTotal = UserCart::where('user_id',$request->UserData->id)->select('price')->sum('price');
         $orderManagement                   =  new OrderManagement;
         $orderManagement->user_id          = $request->UserData->id;
+        $orderManagement->user_name          = $request->UserData->name;
         $orderManagement->order_id         = 'ORD'.rand(1000,9999);
         $orderManagement->shippping_address= $address;
         $orderManagement->total_amount     = $userCartTotal;
         $orderManagement->payment_method   = $request->payment_method;
+        $orderManagement->transaction_id   = $request->transaction_id;
         $orderManagement->order_status     = 1;
         $orderManagement->payment_status   = 1;
         if($orderManagement->save()){
@@ -296,6 +301,7 @@ class UserController extends Controller
                 $orderDetail->user_id          = $orderManagement->user_id;
                 $orderDetail->order_id         = $orderManagement->order_id;
                 $orderDetail->product_id       = $filldetails->product_id;
+                $orderDetail->product_name     = $filldetails->product_name;
                 $orderDetail->small            = $filldetails->small;
                 $orderDetail->medium           = $filldetails->medium;
                 $orderDetail->large            = $filldetails->large;
@@ -327,4 +333,39 @@ class UserController extends Controller
          return Response::json(['message'=>'Past Order', 'data'=>$pastOrder],200);
     }
 
+    public function orderDetail(Request $request){
+        $orderDetail = OrderManagement::where(['user_id'=>$request->UserData->id,'order_id'=>$request->order_id])->select('order_id','shippping_address','payment_method','total_amount','created_at')->with('orderDetails')->get();
+         return Response::json(['message'=>'Past Order', 'data'=>$orderDetail],200);
+    }
+
+    public function contactUs(Request $request){
+        $validations = array(
+            'name'  => 'required',
+            'email'  => 'required',
+            'message'  => 'required',
+        );
+        $validator         = Validator::make($request->all(),$validations);
+        if($validator->fails()){
+            $response = [
+                'message'  => $validator->errors($validator)->first(),   
+            ];
+            return response()->json($response,400);
+        }
+        $contactUs    = new ContactUs;
+        $contactUs->user_id = $request->UserData->id;
+        $contactUs->name    = $request->name;
+        $contactUs->email   = $request->email;
+        $contactUs->message = $request->message;
+        if($contactUs ->save()){
+            return Response::json(['message'=>'Thankyou. You Will Hear From Us Shortly'],200);
+        }else{
+            return Response::json(['message'=>'Something Went Wrong'],400);
+        }
+    }
+
+    public function logOut(Request $request){
+        $token='';
+       User::where('id',$request->UserData->id)->update(['access_token'=>$token]);
+       return response()->json(['msg'=>'Logout Successfully'],200);
+    }
 }
