@@ -40,8 +40,6 @@ Route::group(['prefix' => '/user/'], function () {
         Route::post('order-detail',[UserController::class,'orderDetail']);
         Route::post('contact-us',[UserController::class,'contactUs']);
         Route::post('logout',[UserController::class,'logOut']);
-
-        // Route::post('')
     });
 
 });
@@ -60,9 +58,7 @@ Route::group(['prefix' => '/admin/'], function () {
         Route::post('accept-order',[AdminController::class,'acceptOrder']);
         Route::post('out-for-delivery',[AdminController::class,'outDelivery']);
         Route::get('contact-us',[AdminController::class,'contactUs']);
-
-
-        // Route::post('')
+        Route::post('reply-support',[AdminController::class,'replySupport']);
     });
 
 });

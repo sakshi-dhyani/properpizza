@@ -165,7 +165,30 @@ class AdminController extends Controller
     }
 
     public function contactUs(request $request){
-        $contactUs=ContactUs::all();
+        $contactUs=ContactUs::select('name','email','country_code','mobile','message')->get();
         return response()->json(['message'=>'contactUs', 'data'=>$contactUs], 200);
+    }
+
+    public function replySupport(request $request){
+        $validations    =   array(
+            'id'        =>  'required',
+            'reply'     =>   'required',
+        );
+        $validator  = Validator::make($request->all(),$validations);
+        if($validator->fails()){
+            $response =[
+                'message'=> $validator->errors($validator)->first(),
+            ];
+            return response()->json($response,400);
+        }
+        $getSupport = ContactUs::where('id',$request->id)->first();
+        if($getSupport){
+            ContactUs::where([
+                'id' => $request->id,
+            ])->update(['reply_by_restaurant' => $request->reply]);
+        return response()->json(['status' => 'success', 'message' => 'Success'], 200);
+        }else{
+             return response()->json(['message'=>'Something Went Wrong'], 404);
+        }
     }
 }

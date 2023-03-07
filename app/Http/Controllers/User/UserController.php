@@ -355,6 +355,8 @@ class UserController extends Controller
         $contactUs->user_id = $request->UserData->id;
         $contactUs->name    = $request->name;
         $contactUs->email   = $request->email;
+        $contactUs->country_code   = $request->UserData->country_code;
+        $contactUs->mobile   = $request->UserData->mobile;
         $contactUs->message = $request->message;
         if($contactUs ->save()){
             return Response::json(['message'=>'Thankyou. You Will Hear From Us Shortly'],200);
